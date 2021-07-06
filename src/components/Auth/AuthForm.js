@@ -61,7 +61,10 @@ const AuthForm = () => {
 			})
 			.then((data) => {
 				if (data) {
-					authCtx.login(data.idToken);
+					const expirationTime = new Date(
+						new Date().getTime() + +data.expiresIn * 1000 //expiresIn will be a string and in seconds so we convert to milli
+					);
+					authCtx.login(data.idToken, expirationTime.toISOString());
 					console.log(data);
 					history.replace('/');
 				}
