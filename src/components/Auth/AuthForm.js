@@ -1,8 +1,11 @@
-import { useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
+import { AuthContext } from '../../store/auth-context';
 import classes from './AuthForm.module.css';
 require('dotenv').config();
 
 const AuthForm = () => {
+	const authCtx = useContext(AuthContext);
+
 	const [isLogin, setIsLogin] = useState(true);
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -50,11 +53,12 @@ const AuthForm = () => {
 							errorMessage = data.error.message;
 						}
 						alert(errorMessage);
-						throw new Error(errorMessage);
+						// throw new Error(errorMessage);
 					});
 				}
 			})
 			.then((data) => {
+				if (data) authCtx.login(data.idToken);
 				console.log(data);
 			})
 			.catch((err) => {
