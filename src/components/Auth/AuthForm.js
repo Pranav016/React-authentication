@@ -21,38 +21,45 @@ const AuthForm = () => {
 		//validation
 
 		setIsLoading(true);
+		let url;
 		if (isLogin) {
+			url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.REACT_APP_WEB_KEY}`;
 		} else {
-			fetch(
-				`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${process.env.REACT_APP_WEB_KEY}`,
-				{
-					method: 'POST',
-					body: JSON.stringify({
-						email: enteredEmail,
-						password: enteredPassword,
-						returnSecureToken: true,
-					}),
-					headers: {
-						'content-type': 'application/json',
-					},
-				}
-			)
-				.then((res) => {
-					setIsLoading(false);
-					if (res.ok) {
-					} else {
-						res.json().then((data) => {
-							console.log(data);
-							let errorMessage = 'Authentication Failed!';
-							if (data && data.error) {
-								errorMessage = data.error.message;
-							}
-							alert(errorMessage);
-						});
-					}
-				})
-				.catch();
+			url = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${process.env.REACT_APP_WEB_KEY}`;
 		}
+		fetch(url, {
+			method: 'POST',
+			body: JSON.stringify({
+				email: enteredEmail,
+				password: enteredPassword,
+				returnSecureToken: true,
+			}),
+			headers: {
+				'content-type': 'application/json',
+			},
+		})
+			.then((res) => {
+				setIsLoading(false);
+				if (res.ok) {
+					return res.json();
+				} else {
+					res.json().then((data) => {
+						console.log(data);
+						let errorMessage = 'Authentication Failed!';
+						if (data && data.error) {
+							errorMessage = data.error.message;
+						}
+						alert(errorMessage);
+						throw new Error(errorMessage);
+					});
+				}
+			})
+			.then((data) => {
+				console.log(data);
+			})
+			.catch((err) => {
+				alert(err.message);
+			});
 	};
 
 	return (
